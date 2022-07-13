@@ -72,6 +72,7 @@ class Courses(Document):
     course_difficulty = StringField()
     course_department = StringField()
     course_pathway = StringField()
+    course_gradelevel = StringField()
     create_date = DateTimeField(default=dt.datetime.utcnow)
     modify_date = DateTimeField()
 

@@ -23,7 +23,8 @@ from time import time
 
 class User(UserMixin, Document):
     createdate = DateTimeField(defaultdefault=dt.datetime.utcnow)
-    gid = StringField(sparse=True, unique=True, required=True)
+    #gid = StringField(sparse=True, unique=True, required=True)
+    gid = StringField(sparse=True, unique=True)
     gname = StringField()
     gprofile_pic = StringField()
     isadmin = BooleanField(default=False)
@@ -81,9 +82,9 @@ class Courses(Document):
     }
 
 class TeacherCourse(Document):
-    teachercourseid = StringField(sparse=True)
+    teachercourseid = StringField(sparse=True, required=True,unique=True)
     teacher = ReferenceField('User',reverse_delete_rule=CASCADE, required=True) 
-    course = ReferenceField('Courses',reverse_delete_rule=CASCADE,required=True, unique_with="teacher")
+    course = ReferenceField('Courses',reverse_delete_rule=CASCADE,required=True)
     course_description = StringField()
     course_files = FileField()
     course_link = StringField()

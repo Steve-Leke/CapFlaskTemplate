@@ -4,6 +4,9 @@
 
 {% block body %}
 <h1>Teacher Profile: {{teacher.fname}} {{teacher.lname}}</h1>
+{{teacher.email}} <br>
+RM: {{teacher.troom_number}} <br>
+Teacher Number: {{teacher.teacher_number}}
 <h3>Classes</h3>
 <ul>
 {% for tc in tCourses  %}

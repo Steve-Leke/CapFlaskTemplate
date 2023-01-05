@@ -12,10 +12,11 @@ from wtforms import PasswordField, StringField, SubmitField, TextAreaField, Hidd
 from app.classes.data import User
 
 departments = [("",""),("Mathmatics","Mathmatics"),("Science", "Science"),("English", "English"),("Visual and Performing Arts", "Visual and Performing Arts"),("Humanities", "Humanities"),("PE", "Physical Education (PE)"), ("World Languages", "World Languages"), ("CTE", "Career Techincal Education (CTE)"),("Other Elective","Other Elective")]
+pathways = [("",""),("Computer Science","Computer Science"),("Engineering","Engineering"),("Fashion","Fashion"),("Health","Health"),("Race, Policy and Law","Race, Policy and Law")]
 
 class CourseFilterForm(FlaskForm):
     department = SelectField('Department',choices = departments)
-    filter = SelectField("Filter",choices=[("",""),("Courses with Teachers","Courses with Teachers"),("Courses without Teachers","Courses without Teachers")])
+    filter = SelectField("Filter",choices=[("",""),("Courses with Teachers","Active"),("Courses without Teachers","Probably Old")])
     submit = SubmitField("Search")
 
 class ProfileForm(FlaskForm):
@@ -38,12 +39,14 @@ class CommentForm(FlaskForm):
     submit = SubmitField('Comment')
 
 class CoursesForm(FlaskForm):
-    course_number = StringField('Course Number', validators=[DataRequired()])
-    course_title = StringField('Course Title', validators=[DataRequired()])
+    # Don't want to change these from what they are in Aeries
+    # course_number = StringField('Course Number', validators=[DataRequired()])
+    # course_title = StringField('Course Title', validators=[DataRequired()])
     course_name = StringField('Course Name', validators=[DataRequired()])
     course_ag_requirement = SelectField('Courses A-G Requirement',choices=[("",""),("A-History","A-History"),("B-English", "B-English"), ("C-Mathematics","C-Mathematics"), ("D-Science","D-Science"), ("E-Language Other Than English","E-Language Other Than English"), ("F-Visual And Performing Arts","F-Visual And Performing Arts"), ("G-College-Preparatory Elective","G- College-Preparatory Elective")])
-    course_difficulty = SelectField('Course Difficulty',choices=[("",""),("Advanced Placement (AP)","Advanced Placement (AP)"),("Honors (HP)", "Honors (HP)")])
+    course_difficulty = SelectField('Course Difficulty',choices=[("",""),("AP","Advanced Placement (AP)"),("HP", "Honors (HP)"),("CP","College Prep (CP)")])
     course_department = SelectField('Course Department',choices=departments)
+    course_pathway = SelectField('Course Pathway', choices=pathways)
     submit = SubmitField('Add Course')
 
 class TeacherCourseForm(FlaskForm):

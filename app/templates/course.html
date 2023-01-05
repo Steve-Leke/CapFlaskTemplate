@@ -18,13 +18,30 @@ Created {{moment(course.create_date).calendar()}}
         </a>
     {% endif %}
 
-    <h1 class="display-5">{{course.course_title}}</h1>
+    
+        {% if course.course_name %}
+        <h1 class="display-5">
+            {{course.course_name}}
+        </h1>
+            <b>Aeries Name:</b> {{course.course_title}} <br>
+        {% else %}
+        <h1 class="display-5">
+            {{course.course_title}}
+        </h1>
+        {% endif %}
+    
+        <b>Course ID:</b> {{course.course_number}} <br> 
     <p class="fs-3 text-break">
-            <h5 class="mt-5">Course Number:</h5>{{course.course_number}} <br> 
-            <h5>Course Name:</h5>{{course.course_name}} <br> 
-            <h5>Course A-G Requirement:</h5>{{course.course_ag_requirement}} <br> 
-            <h5>Course Difficulty:</h5>{{course.course_difficulty}} <br> 
-            <h5>Course Department:</h5>{{course.course_department}} <br>
+            
+            <p class="mt-5">
+                <b>Course Name:</b> {{course.course_name}} <br> 
+                <b>Course A-G Requirement:</b> {{course.course_ag_requirement}}<br> 
+                <b>Course Difficulty:</b>  {{course.course_difficulty}} <br> 
+                <b>Course Department:</b>  {{course.course_department}} <br>
+                {% if course.course_pathway %}
+                    <b>Course Pathway:</b>  {{course.course_pathway}}
+                {% endif %}
+            </p>
             
             {% if teacherCourses %}
             <h5>Teachers</h5>

@@ -5,11 +5,10 @@ from flask import render_template, redirect, flash
 from app.classes.data import User, Courses, TeacherCourse
 import pandas as pd
 import datetime as dt
-from mongoengine.errors import NotUniqueError, DoesNotExist
+from mongoengine.errors import NotUniqueError, DoesNotExist, MultipleObjectsReturned
 from mongoengine import Q
 
-
-@app.route('/coursesimport')
+@app.route('/importcourses')
 def coursesimport():
     # Place a csv file of the courses to be imported into the csv 
     # folder at the root level. name the file 'courses.csv' and name all
@@ -28,13 +27,18 @@ def coursesimport():
     # see if the course exists in the database.  If it does, it will update it.
     # If it doesn't, it will create a new one.
     for i,course in enumerate(courses):
+        if course['course_title'] == "Comp SCI Senior":
+            print(f"{i}/{length}: here it is")
         try:
             thisCourse = Courses.objects.get(course_number=course['course_number'])
+            print(f"{i}/{length}: found the course")
         except DoesNotExist:
             thisCourse = False
+            print(f"{i}/{length}: Does not exist")
+
+        # Don't update because you will overwrite any edits
         else:
             thisCourse.update(
-                course_number = course['course_number'],
                 course_title = course['course_title'],
                 course_name = course['course_name'],
                 course_ag_requirement = course['course_ag_requirement'],
@@ -42,6 +46,7 @@ def coursesimport():
                 course_department = course['course_department'],
                 modify_date = dt.datetime.utcnow 
             )
+
         if not thisCourse:
             newCourse = Courses(
                 course_number = course['course_number'],
@@ -53,7 +58,9 @@ def coursesimport():
                 modify_date = dt.datetime.utcnow 
             )
             newCourse.save()
-        print(f"importing {i}/{length}: {course['course_number']} ")
+
+            print(f"saved {i}/{length}: {course['course_number']} ")
+
     return redirect(url_for('index'))
 
 @app.route('/importteachers')
@@ -63,8 +70,10 @@ def importteachers():
     teachers = df_teachers.to_dict(orient='records')
     length = len(teachers)
     for i,teacher in enumerate(teachers):
+
+        query = Q(teacher_number=teacher['teacher_number']) | Q(email=teacher['email'])
         try:
-            thisTeacher = User.objects.get(teacher_number=teacher['teacher_number'])
+            thisTeacher = User.objects.get(query)
             print('Teacher exists.')
         except:
             thisTeacher = False
@@ -73,8 +82,6 @@ def importteachers():
             thisTeacher.update(
                 teacher_number = teacher['teacher_number'],
                 email = teacher['email'],
-                fname = teacher['fname'],
-                lname = teacher['lname'],
                 role = 'Teacher',
                 troom_number = teacher['troom_number']
             )
@@ -101,27 +108,21 @@ def importteachercourses():
     length = len(teachercourses)
     for i,tcourse in enumerate(teachercourses):
         importProceed=True
-        try:
-            course = Courses.objects.get(course_number = tcourse['course_number'])
-        except:
-            print(f"course {tcourse['course_number']} doesn't exist. ")
-            importProceed = False
-        try:
-            teacher = User.objects.get(teacher_number = tcourse['teacher_number'])
-        except:
-            print(f"Teacher {tcourse['teacher_number']} doesn't exist. ")
-            importProceed = False
+        course = Courses.objects.get(course_number = tcourse['course_number'])
+        teacher = User.objects.get(teacher_number = tcourse['teacher_number'])
         if importProceed:
-            query = Q(course = course) and Q(teacher=teacher)
+            query = Q(course=course) & Q(teacher=teacher)
             try:
-                thisTeacherCourse = TeacherCourse.objects.get(query)
-            except:
+                TeacherCourse.objects.get(query)
+                print(f"{i+1}/{length}: Already exists TeacherCourse {teacher.fname} {teacher.lname} {course.course_title}.")
+            except MultipleObjectsReturned:
+                flash(f"Multiple TeacherCourses returned. This shouldn't ever happen. Teacher: {teacher.lname} Course: {course.course_title}")
+            except DoesNotExist:
                 newTeacherCourse = TeacherCourse(
                     teacher = teacher,
-                    course = course
+                    course = course,
+                    teachercourseid = str(teacher.teacher_number) + str(course.course_number)
                 )
                 newTeacherCourse.save()
-                print(f"{i}/{length}: Created TeacherCourse {teacher.fname} {teacher.lname} {course.course_title}")
-            else:
-                print(f"{i}/{length}: Already exists TeacherCourse {teacher.fname} {teacher.lname} {course.course_title}.")
+                flash(f"{i+1}/{length}: Created New TeacherCourse {teacher.fname} {teacher.lname} {course.course_title}")
     return redirect(url_for('index'))

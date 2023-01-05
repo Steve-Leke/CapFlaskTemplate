@@ -23,6 +23,15 @@ def course(courseID):
 def courseList():
     form = CourseFilterForm()
     courses = Courses.objects()
+    depts = []
+    for course in courses:
+        if course.course_department not in depts:
+            depts.append(course.course_department)
+    depts.sort()
+    deptChoices = []
+    for dept in depts:
+        deptChoices.append((dept,dept))
+    form.department.choices = deptChoices
 
     if form.validate_on_submit():
         if len(form.department.data) > 0:
@@ -30,9 +39,13 @@ def courseList():
 
         def uniqueTCourses():
             tCoursesAll = TeacherCourse.objects()
+            total = len(tCoursesAll)
             tCourses=[]
-            for tc in tCoursesAll:
-                tCourses.append(tc.course)
+            for i,tc in enumerate(tCoursesAll):
+                try:
+                    tCourses.append(tc.course)
+                except Exception as error:
+                    flash(f"{i}/{total}: {tc.id} {error}")
             tCourses=set(tCourses)
             return(tCourses)
 
@@ -48,9 +61,7 @@ def courseList():
         else:
             tCourses = False
 
-        if tCourses == False:
-            pass
-        else:
+        if tCourses != False:
             intersection = []
             for course in tCourses:
                 if course in courses:
@@ -93,22 +104,20 @@ def courseEdit(courseID):
     form = CoursesForm()
     if form.validate_on_submit():
         editCourse.update(
-            course_number = form.course_number.data,
-            course_title = form.course_title.data,
             course_name = form.course_name.data,
             course_ag_requirement = form.course_ag_requirement.data,
             course_difficulty = form.course_difficulty.data,
             course_department = form.course_department.data,
+            course_pathway = form.course_pathway.data,
             modify_date = dt.datetime.utcnow
         )
         return redirect(url_for('course',courseID=courseID))
 
-    form.course_number.data = editCourse.course_number
-    form.course_title.data = editCourse.course_title
     form.course_name.data = editCourse.course_name
     form.course_ag_requirement.data = editCourse.course_ag_requirement
     form.course_difficulty.data = editCourse.course_difficulty
     form.course_department.data = editCourse.course_department
+    form.course_pathway.data = editCourse.course_pathway
 
     return render_template('coursesform.html',form=form, course=editCourse)
 

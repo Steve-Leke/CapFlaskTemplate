@@ -30,8 +30,11 @@
         {% else %}
           <li class="nav-item">
             <a class="nav-link" href="/myprofile">
-              {{ current_user.gname }}
-              {% if current_user.isadmin %} (Admin){% endif %}
+              {{ current_user.gname }} 
+              (
+              {{current_user.role}} 
+              {% if current_user.isadmin %} , Admin {% endif %}
+              )
             </a>
             
           </li>          

@@ -1,11 +1,13 @@
+import os
+
 def getSecrets():
     secrets = {
-        'MAIL_PASSWORD':'M0c0s0sness',
-        'MAIL_USERNAME':'wrightenich@gmail.com',
-        'MONGO_HOST':'mongodb+srv://admin:bu11d0gz@cluster0.8m0v1.mongodb.net/coursecat?retryWrites=true&w=majority',
+        'MAIL_PASSWORD':os.environ.get('MAIL_PASSWORD'),
+        'MAIL_USERNAME':os.environ.get('MAIL_USERNAME'),
+        'MONGO_HOST':os.environ.get('cc_mongodb_host'),
         'MONGO_DB_NAME':'coursecat',
-        'GOOGLE_CLIENT_ID': '156309448916-0glcf34pe18fdl2cgb84796i0b6svk2m.apps.googleusercontent.com',
-        'GOOGLE_CLIENT_SECRET':'8pZCtCL_c35o9HOtw2MeOp5A',
+        'GOOGLE_CLIENT_ID': os.environ.get('cc_google_client_id'),
+        'GOOGLE_CLIENT_SECRET':os.environ.get('cc_google_client_secret'),
         'GOOGLE_DISCOVERY_URL':"https://accounts.google.com/.well-known/openid-configuration"
         }
     return secrets

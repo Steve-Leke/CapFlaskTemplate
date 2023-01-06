@@ -57,6 +57,7 @@ def login():
         scope=["openid", "email", "profile"],
         prompt="select_account"
     )
+    print(request_uri)
     return redirect(request_uri)
 
 

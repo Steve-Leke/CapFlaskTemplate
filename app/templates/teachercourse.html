@@ -5,8 +5,10 @@
 {% block body %}
 {% if current_user.isadmin or current_user == tCourse.teacher %}
     <a href="/teachercourse/edit/{{tCourse.id}}"><img width="20" src="/static/edit.png"></a>
-    <a href="/teachercourse/delete/{{tCourse.id}}"><img width="20" src="/static/delete.png"></a>
-{% endif %}
+    {% if current_user.isadmin %}
+        <a href="/teachercourse/delete/{{tCourse.id}}"><img width="20" src="/static/delete.png"></a>
+    {% endif %}
+        {% endif %}
 <h1>
     {% if tCourse.course.course_name %}
         <a href="/course/{{tCourse.course.id}}">{{tCourse.course.course_name}}</a>

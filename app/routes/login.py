@@ -15,7 +15,8 @@ from app.classes.data import User
 from app.utils.secrets import getSecrets
 import mongoengine.errors
 
-admins = ["stephen.wright@ousd.org"]
+admins=[]
+# admins = ["stephen.wright@ousd.org"]
 
 #get all the credentials for google
 secrets = getSecrets()
@@ -57,7 +58,6 @@ def login():
         scope=["openid", "email", "profile"],
         prompt="select_account"
     )
-    print(request_uri)
     return redirect(request_uri)
 
 
@@ -129,8 +129,8 @@ def callback():
     # Get user from DB or create new user
     try:
         thisUser=User.objects.get(email=gmail)
-    except:
-        if gmail in admins:
+    except mongoengine.errors.DoesNotExist:
+        if gmail in admins or userinfo_response.json().get("hd") == "ousd.org":
             thisUser = User(
                 gid=gid, 
                 gname=gname, 
@@ -141,8 +141,8 @@ def callback():
             )
             thisUser.save()
         else:
-            flash("You need an account to log in to this site.")
-            return redirect(url_for('/index'))
+            flash("You must have an ousd.org email to login to this site.")
+            return redirect(url_for('index'))
 
     else:
         thisUser.update(
@@ -155,6 +155,8 @@ def callback():
     thisUser.reload()
     if thisUser.email in admins and not thisUser.isadmin:
         thisUser.update(isadmin=True)
+    elif thisUser.email not in admins and thisUser.isadmin:
+        thisUser.update(isadmin=False)
 
     # Begin user session by logging the user in
     login_user(thisUser)

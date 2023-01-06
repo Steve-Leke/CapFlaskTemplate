@@ -146,9 +146,12 @@ def teachercourse(tcid):
 @app.route('/teachercourse/delete/<tcid>')
 @login_required
 def teachercourseDelete(tcid):
-    delTCID = TeacherCourse.objects.get(id=tcid)
-    teacherID = delTCID.teacher.id
-    delTCID.delete()
+    if current_user.isadmin:
+        delTCID = TeacherCourse.objects.get(id=tcid)
+        teacherID = delTCID.teacher.id
+        delTCID.delete()
+    else:
+        flash('Only Admins can delete.  If you teach this class you should be able to edit.')
     return redirect(url_for('teacher',teacherID=teacherID))
 
 
@@ -188,11 +191,15 @@ def teacherCourseAdd(teacherID,courseID=None):
     if not current_user.role.lower() == "teacher":
         flash('You are not a teacher.')
         return redirect(url_for('teacher/list'))
-    elif not courseID:
+
+    
+    if courseID == None:
         courses = Courses.objects()
         teacher = User.objects.get(id=teacherID)
         return render_template('teachercourseadd.html', teacher = teacher, courses=courses)
-    elif teacherID != current_user.id and not current_user.isadmin:
+    
+    flash(teacherID,current_user.id)
+    if teacherID != current_user.id and not current_user.isadmin:
         flash("You don't have the privleges to add this teacher course.")
         return redirect(url_for("teacher",teacherID=teacherID))
     else:

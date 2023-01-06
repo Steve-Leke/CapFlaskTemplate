@@ -53,7 +53,7 @@ class TeacherCourseForm(FlaskForm):
     teacher = SelectField('Teacher',choices=[],validate_choice=False)
     course = SelectField('Course',choices=[],validate_choice=False)
     course_description = StringField('Course Description')
-    course_link = URLField("A link to a Google Document or a folder", validators=[URL()]) 
+    course_link = URLField("A link to a Google Document or a folder",default="https://cc.hsoakland.tech", validators=[URL()]) 
     submit = SubmitField('Submit')
 
 # Start building out the physical forms. Follow the process you used to create the school tag

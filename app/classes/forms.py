@@ -16,7 +16,6 @@ pathways = [("",""),("Computer Science","Computer Science"),("Engineering","Engi
 
 class CourseFilterForm(FlaskForm):
     department = SelectField('Department',choices = departments)
-    filter = SelectField("Filter",choices=[("",""),("Courses with Teachers","Active"),("Courses without Teachers","Probably Old")])
     submit = SubmitField("Search")
 
 class ProfileForm(FlaskForm):

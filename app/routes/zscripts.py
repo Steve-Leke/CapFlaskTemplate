@@ -126,3 +126,13 @@ def importteachercourses():
                 newTeacherCourse.save()
                 flash(f"{i+1}/{length}: Created New TeacherCourse {teacher.fname} {teacher.lname} {course.course_title}")
     return redirect(url_for('index'))
+
+@app.route('/setcp')
+def setcp():
+    allCourses = Courses.objects()
+    for course in allCourses:
+        if course.course_title[-2:] == " P" or course.course_title[-8:] == "P B APEX" or course.course_title[-8:] == "P A APEX":
+            course.update(
+                course_difficulty = "CP"
+            )
+    return redirect(url_for("activecourses"))

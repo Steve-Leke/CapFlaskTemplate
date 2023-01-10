@@ -18,57 +18,80 @@ def course(courseID):
     teacherCourses = TeacherCourse.objects(course = thisCourse)
     return render_template('course.html',course=thisCourse, comments=theseComments, teacherCourses=teacherCourses)
 
-@app.route('/course/list',methods=["GET","POST"])
+def getActiveCourses():
+    # pipeline is how pymongo access the mongodb aggregation API 
+    # https://pymongo.readthedocs.io/en/stable/examples/aggregation.html
+    # the $lookup aggregation stage is how mongodb does "outer left joins"
+    # which means everything in table1 (left) and everything in table2 (right) that is in table 1
+    pipeline = [
+                {"$lookup":
+                    {
+                    "from": "TeacherCourses",
+                    "localField": "teacher",
+                    "foreignField": "teacher",
+                    "as": "courses"
+                    }
+                }
+        ]
+    # aggregate is how mongoengine access pymongo 
+    # http://docs.mongoengine.org/guide/querying.html#aggregation
+    courses = Courses.objects().aggregate(pipeline)
+    return(courses)
+
+@app.route('/course/list')
+@app.route('/activecourses')
+@login_required
+def activecourses():
+
+    courses = getActiveCourses()
+
+    return render_template('courses.html',courses=courses,title="Active Courses")
+
+@app.route('/allcourses')
 @login_required
 def courseList():
-    form = CourseFilterForm()
-    courses = Courses.objects()
-    depts = []
-    for course in courses:
-        if course.course_department not in depts:
-            depts.append(course.course_department)
-    depts.sort()
-    deptChoices = []
-    for dept in depts:
-        deptChoices.append((dept,dept))
-    form.department.choices = deptChoices
 
-    if form.validate_on_submit():
-        if len(form.department.data) > 0:
-            courses = Courses.objects(course_department = form.department.data)
+    allCourses = Courses.objects()
 
-        def uniqueTCourses():
-            tCoursesAll = TeacherCourse.objects()
-            total = len(tCoursesAll)
-            tCourses=[]
-            for i,tc in enumerate(tCoursesAll):
-                try:
-                    tCourses.append(tc.course)
-                except Exception as error:
-                    flash(f"{i}/{total}: {tc.id} {error}")
-            tCourses=set(tCourses)
-            return(tCourses)
+    return render_template('courses.html',courses=allCourses, title="All Courses")
 
-        if form.filter.data == "Courses with Teachers":
-            tCourses = uniqueTCourses()
-        elif form.filter.data == "Courses without Teachers":
-            tCourses = uniqueTCourses()
-            tCoursesNot = []
-            for element in courses:
-                if element not in tCourses:
-                    tCoursesNot.append(element)
-            tCourses = tCoursesNot
-        else:
-            tCourses = False
+# @app.route('/course/list',methods=["GET","POST"])
+# @login_required
+# def courseList():
+#     form = CourseFilterForm()
+#     courses = Courses.objects()
+#     depts = []
+#     for course in courses:
+#         if course.course_department not in depts:
+#             depts.append(course.course_department)
+#     depts.sort()
+#     deptChoices = []
+#     for dept in depts:
+#         deptChoices.append((dept,dept))
+#     form.department.choices = deptChoices
+#     tCourses = uniqueTCourses()
 
-        if tCourses != False:
-            intersection = []
-            for course in tCourses:
-                if course in courses:
-                    intersection.append(course)
-            courses = intersection
+#     if form.validate_on_submit():
+#         if len(form.department.data) > 0:
+#             courses = Courses.objects(course_department = form.department.data)
+
+#         if form.filter.data == "Courses without Teachers":
+#             tCoursesNot = []
+#             for element in courses:
+#                 if element not in tCourses:
+#                     tCoursesNot.append(element)
+#             tCourses = tCoursesNot
+#         else:
+#             tCourses = False
+
+#     if tCourses != False:
+#         intersection = []
+#         for course in tCourses:
+#             if course in courses:
+#                 intersection.append(course)
+#         courses = intersection
         
-    return render_template('courses.html',courses=courses,form=form)
+#     return render_template('courses.html',courses=courses,form=form)
 
 @app.route('/course/new', methods=['GET', 'POST'])
 @login_required

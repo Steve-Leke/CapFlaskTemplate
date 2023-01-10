@@ -16,7 +16,6 @@ from app.utils.secrets import getSecrets
 import mongoengine.errors
 
 admins=["stephen.wright@ousd.org","s_georgia.wallace@ousd.org"]
-# admins = ["stephen.wright@ousd.org"]
 
 #get all the credentials for google
 secrets = getSecrets()

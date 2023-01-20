@@ -5,6 +5,7 @@ copy this one and then edit it. -->
 
 {% block body %}
         <h1>Courses Form</h1>
+        <h2>Admin access only! Be careful editing these records!</h2>
 
         <!--List all errors in a group at the top-->
         {% for field in form.errors %}
@@ -17,12 +18,38 @@ copy this one and then edit it. -->
 
         <form method=post>
             {{ form.hidden_tag() }}
-            <b>Course ID:</b> {{ course.course_number}}<br>
-            <b>Aeries Title:</b> {{ course.course_title}}<br><br>
+            <p>
+                {{ form.course_number.label }}<br>
+                {{ form.course_number(size=64) }}<br>
+                {% for error in form.course_number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.course_title.label }}<br>
+                {{ form.course_title(size=64) }}<br>
+                {% for error in form.course_title.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
             <p>
                 {{ form.course_name.label }}<br>
                 {{ form.course_name(size=64) }}<br>
                 {% for error in form.course_name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.course_paideia_option.label }} 
+                {{ form.course_paideia_option(size=64) }}<br>
+                {% for error in form.course_paideia_option.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.course_gradelevel.label }}<br>
+                {{ form.course_gradelevel() }}<br>
+                {% for error in form.course_gradelevel.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>

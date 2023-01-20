@@ -36,7 +36,7 @@ class User(UserMixin, Document):
     image = FileField()
     role = StringField()
     school = StringField()
-    prononuns = StringField()
+    pronouns = StringField()
     
     # Below Is All The Teacher Keys
     teacher_number = IntField(sparse=True,unique=True)
@@ -73,6 +73,7 @@ class Courses(Document):
     course_difficulty = StringField()
     course_department = StringField()
     course_pathway = StringField()
+    course_paideia_option = BooleanField()
     course_gradelevel = StringField()
     create_date = DateTimeField(default=dt.datetime.utcnow)
     modify_date = DateTimeField()
@@ -90,6 +91,7 @@ class TeacherCourse(Document):
     course_link = StringField()
     create_date = DateTimeField(default=dt.datetime.utcnow)
     modify_date = DateTimeField()
+    is_paideia = BooleanField()
 
     meta = {
         'ordering': ['-createdate']

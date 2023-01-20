@@ -17,8 +17,7 @@ Created {{moment(course.create_date).calendar()}}
             <img width="40" class="bottom-image" src="/static/edit.png">
         </a>
     {% endif %}
-
-    
+    <p class="fs-3 text-break">
         {% if course.course_name %}
         <h1 class="display-5">
             {{course.course_name}}
@@ -31,13 +30,13 @@ Created {{moment(course.create_date).calendar()}}
         {% endif %}
     
         <b>Course ID:</b> {{course.course_number}} <br> 
-    <p class="fs-3 text-break">
-            
-            <p class="mt-5">
-                <b>Course Name:</b> {{course.course_name}} <br> 
-                <b>Course A-G Requirement:</b> {{course.course_ag_requirement}}<br> 
-                <b>Course Difficulty:</b>  {{course.course_difficulty}} <br> 
-                <b>Course Department:</b>  {{course.course_department}} <br>
+
+            <p>
+                <b>Name:</b> {{course.course_name}} <br> 
+                <b>A-G Requirement:</b> {{course.course_ag_requirement}}<br> 
+                <b>Difficulty:</b>  {{course.course_difficulty}} <br> 
+                <b>Department:</b>  {{course.course_department}} <br>
+                <b>Paideia Option:</b>  {{course.course_paideia_option}} <br>
                 {% if course.course_pathway %}
                     <b>Course Pathway:</b>  {{course.course_pathway}}
                 {% endif %}
@@ -56,7 +55,7 @@ Created {{moment(course.create_date).calendar()}}
       <a href="/comment/new/{{course.id}}" class="btn btn-primary btn-sm" role="button">New Comment</a>
 
 </div>
-    <div class="ms-5 mt-5 col-2">
+    <div>
         {% if comments %}
         <h1 class="display-5">Comments</h1>
         {% for comment in comments %}
@@ -76,7 +75,7 @@ Created {{moment(course.create_date).calendar()}}
         {% else %}
             <h1 class="display-5">No Comments</h1>
         {% endif %}
-        </div>
+    </div>
 {% else %}
     <h1 class="display-5">No Course</h1>
 {% endif %}

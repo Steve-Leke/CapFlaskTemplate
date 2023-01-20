@@ -71,19 +71,19 @@
         <td>
             {% if course.course_pathway %}
                 {{course.course_pathway}}
-            {% else %}
-                ?
+            {% endif %}
+            {% if course.course_paideia_option %}
+            {% if course.course_pathway %} <br> {% endif %}
+                Paideia
             {% endif %}
         </td>
         <td>
             {% if course.course_gradelevel %}
                 {{course.course_gradelevel}}
-            {% else %}
-                ?
             {% endif %}
         </td>
         <td>
-            <small>{{moment(course.create_date).calendar()}}</small>
+            <small>{{moment(course.modify_date).calendar()}}</small>
         </td>
     </tr>
     {% endfor %}

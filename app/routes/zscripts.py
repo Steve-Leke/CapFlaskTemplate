@@ -136,3 +136,12 @@ def setcp():
                 course_difficulty = "CP"
             )
     return redirect(url_for("activecourses"))
+
+@app.route('/fash2fada')
+def fash2fada():
+    fashCourses = Courses.objects(course_pathway = "Fashion")
+    for course in fashCourses:
+        course.update(
+            course_pathway = "FADA"
+        )
+    return redirect(url_for("activecourses"))

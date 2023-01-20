@@ -55,59 +55,26 @@ def courseList():
 
     return render_template('courses.html',courses=allCourses, title="All Courses")
 
-# @app.route('/course/list',methods=["GET","POST"])
-# @login_required
-# def courseList():
-#     form = CourseFilterForm()
-#     courses = Courses.objects()
-#     depts = []
-#     for course in courses:
-#         if course.course_department not in depts:
-#             depts.append(course.course_department)
-#     depts.sort()
-#     deptChoices = []
-#     for dept in depts:
-#         deptChoices.append((dept,dept))
-#     form.department.choices = deptChoices
-#     tCourses = uniqueTCourses()
-
-#     if form.validate_on_submit():
-#         if len(form.department.data) > 0:
-#             courses = Courses.objects(course_department = form.department.data)
-
-#         if form.filter.data == "Courses without Teachers":
-#             tCoursesNot = []
-#             for element in courses:
-#                 if element not in tCourses:
-#                     tCoursesNot.append(element)
-#             tCourses = tCoursesNot
-#         else:
-#             tCourses = False
-
-#     if tCourses != False:
-#         intersection = []
-#         for course in tCourses:
-#             if course in courses:
-#                 intersection.append(course)
-#         courses = intersection
-        
-#     return render_template('courses.html',courses=courses,form=form)
-
 @app.route('/course/new', methods=['GET', 'POST'])
 @login_required
 def courseNew():
+    if not current_user.isadmin:
+        flash("Only Admins can create new courses.")
+        return redirect(url_for('activecourses'))
+
     form = CoursesForm()
 
     if form.validate_on_submit():
 
         newCourse = Courses(
             course_number = form.course_number.data,
+            course_paideia_option = form.course_paideia_option,
             course_title = form.course_title.data,
             course_name = form.course_name.data,
             course_ag_requirement = form.course_ag_requirement.data,
             course_difficulty = form.course_difficulty.data,
             course_department = form.course_department.data,
-            # author = current_user.id,
+            course_gradelevel = form.course_gradelevel.data,
             modify_date = dt.datetime.utcnow
         )
         newCourse.save()
@@ -126,16 +93,25 @@ def courseEdit(courseID):
         return redirect(url_for('course',courseID=courseID))
     form = CoursesForm()
     if form.validate_on_submit():
+
         editCourse.update(
+            course_number = form.course_number.data,
+            course_title = form.course_title.data,
             course_name = form.course_name.data,
             course_ag_requirement = form.course_ag_requirement.data,
             course_difficulty = form.course_difficulty.data,
             course_department = form.course_department.data,
             course_pathway = form.course_pathway.data,
+            course_paideia_option = form.course_paideia_option.data,
+            course_gradelevel = form.course_gradelevel.data,
             modify_date = dt.datetime.utcnow
         )
         return redirect(url_for('course',courseID=courseID))
 
+    form.course_number.data = editCourse.course_number
+    form.course_gradelevel.data = editCourse.course_gradelevel
+    form.course_paideia_option.data = editCourse.course_paideia_option
+    form.course_title.data = editCourse.course_title
     form.course_name.data = editCourse.course_name
     form.course_ag_requirement.data = editCourse.course_ag_requirement
     form.course_difficulty.data = editCourse.course_difficulty
@@ -189,11 +165,13 @@ def teacherCourseEdit(tcid):
     if form.validate_on_submit():
         thisTC.update(
             course_description = form.course_description.data,
-            course_link = form.course_link.data
+            course_link = form.course_link.data,
+            is_paideia = form.is_paideia.data
         )
         return redirect(url_for('teachercourse',tcid=thisTC.id))
     form.course_description.data = thisTC.course_description
     form.course_link.data = thisTC.course_link
+    form.is_paideia.data = thisTC.is_paideia
     return render_template('teachercourseform.html',form=form,teacherCourse=thisTC)
 
 

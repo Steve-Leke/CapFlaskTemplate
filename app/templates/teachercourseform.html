@@ -21,6 +21,13 @@ copy this one and then edit it. -->
         <form method=post>
             {{ form.hidden_tag() }}
             
+            {{ form.is_paideia.label }}: 
+            {{ form.is_paideia() }} <br>
+            <!--List the errors for this field-->
+            {% for error in form.is_paideia.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+
             {{ form.course_description.label }} <br>
             {{ form.course_description(size=64) }}
             <!--List the errors for this field-->

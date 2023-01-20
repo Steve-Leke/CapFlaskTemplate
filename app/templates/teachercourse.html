@@ -17,6 +17,9 @@
     {% endif %}
 </h1>
 <h3>Taught by: <a href="/teacher/{{tCourse.teacher.id}}">{{tCourse.teacher.fname}} {{tCourse.teacher.lname}}</a></h3>
+{% if tCourse.is_paideia %}
+    Is Paideia: {{tCourse.is_paideia}} <br>
+{% endif %}
 {% if tCourse.course_description %}
     {{tCourse.course_description}} 
 {% else %}

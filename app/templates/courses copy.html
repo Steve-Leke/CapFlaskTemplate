@@ -5,27 +5,47 @@
 {% block body %}
 
 
-    <h1 class="display-5">
-        {{title}}
-    </h1>
-        {% if title == "Active Courses" %}
-        <small>All of these classes are being taught this year so they are likely to be taught next year.</small>
-        {% else %}
-        <small>Some of these classes are NOT being taught this year so they may not be taught next year.</small>
-        {% endif %}
-    <h1 class="display-5">
-        {{title}}
-    </h1>
-        {% if title == "Active Courses" %}
-        <small>All of these classes are being taught this year so they are likely to be taught next year.</small>
-        {% else %}
-        <small>Some of these classes are NOT being taught this year so they may not be taught next year.</small>
-        {% endif %}
+{% if request.environ.PATH_INFO != "/tcoursefilter/courses" %}
+<div class="mt-5 d-flex justify-content-center">
+    <h1 class="display-5">All Courses</h1>
+</div>
+{% for field in form.errors %}
+    {% for error in form.errors[field] %}
+        <div class="alert alert-error">
+            <strong>Error!</strong>{{field}}: {{error}}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<form method="post">
+    <div class="row">
+        <div class="col-4">
+        {{ form.hidden_tag() }}
+            <span class="h6">{{form.department.label }}:</span> 
+            {{ form.department() }}
+        </div>
+        <div class="col-8">
+            <span class="h6">{{form.filter.label }}:</span> 
+            {{ form.filter() }}
+            {{form.submit()}} <br>
+            <small>
+                active means that there is a teacher associated with the course
+            </small>
+        </div>
+    </div>
+</form>
 
 <div class="d-flex justify-content-center">
     <a href="/course/new" class="btn btn-primary btn-sm mt-5" role="button">New Course</a>
 </div>
-
+{% else %}
+    <div class="d-flex justify-content-center">
+        <h1 class="display-5">Courses with Teachers</h1>
+    </div>
+    <div class="d-flex justify-content-center">
+        <a href="/course/list">All Courses</a>
+    </div>
+{% endif %}
 <table class="table">
 {% if courses %}
     <tr>
@@ -38,21 +58,20 @@
         <th>Grade Level</th>
         <th>Last Update</th>
     </tr>
-    {% for course in courses | sort(attribute="course_number") %}
+    {% for course in courses | sort(attribute="course_department") %}
     <tr>
         <td>
-            <a href="/course/{{course._id}}">{{course.course_number}}</a>
+            <a href="/course/{{course.id}}">{{course.course_number}}</a>
             {% if current_user.isadmin %}
-                <a href="/course/edit/{{course._id}}"><img width="20" src="/static/edit.png"></a>
+                <a href="/course/edit/{{course.id}}"><img width="20" src="/static/edit.png"></a>
                 <!-- <a href="/course/delete/{{course.id}}"><img width="20" src="/static/delete.png"></a> -->
             {% endif %} 
         </td>
         <td>
             {% if course.course_name %}
-                {{course.course_name}}<br>
-                <small>{{course.course_title}}</small>
+                {{course.course_name}}
             {% else %}
-                {{course.course_title}} 
+                {{course.course_title}}
             {% endif %}
         </td>
         <td>
@@ -79,19 +98,19 @@
         <td>
             {% if course.course_pathway %}
                 {{course.course_pathway}}
-            {% endif %}
-            {% if course.course_paideia_option %}
-            {% if course.course_pathway %} <br> {% endif %}
-                Paideia
+            {% else %}
+                ?
             {% endif %}
         </td>
         <td>
             {% if course.course_gradelevel %}
                 {{course.course_gradelevel}}
+            {% else %}
+                ?
             {% endif %}
         </td>
         <td>
-            <small>{{moment(course.modify_date).calendar()}}</small>
+            <small>{{moment(course.create_date).calendar()}}</small>
         </td>
     </tr>
     {% endfor %}

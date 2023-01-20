@@ -4,6 +4,7 @@
 
 {% block body %}
 {% if current_user.isadmin or current_user == tCourse.teacher %}
+{% if current_user.isadmin or current_user == tCourse.teacher %}
     <a href="/teachercourse/edit/{{tCourse.id}}"><img width="20" src="/static/edit.png"></a>
     {% if current_user.isadmin %}
         <a href="/teachercourse/delete/{{tCourse.id}}"><img width="20" src="/static/delete.png"></a>
@@ -24,10 +25,16 @@
     {{tCourse.course_description}} 
 {% else %}
     No Course Description yet... 
+    {{tCourse.course_description}} 
+{% else %}
+    No Course Description yet... 
 {% endif %}
+<br>
 <br>
 {% if tCourse.course_link %}
     <a href="{{tCourse.course_link}}">{{tCourse.course_link}}</a>
+{% else %}
+    No Links to course resources yet...
 {% else %}
     No Links to course resources yet...
 {% endif %}

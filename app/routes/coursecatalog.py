@@ -48,6 +48,36 @@ def activecourses():
     return render_template('courses.html',courses=courses,title="Active Courses")
 
 @app.route('/allcourses')
+def getActiveCourses():
+    # pipeline is how pymongo access the mongodb aggregation API 
+    # https://pymongo.readthedocs.io/en/stable/examples/aggregation.html
+    # the $lookup aggregation stage is how mongodb does "outer left joins"
+    # which means everything in table1 (left) and everything in table2 (right) that is in table 1
+    pipeline = [
+                {"$lookup":
+                    {
+                    "from": "TeacherCourses",
+                    "localField": "teacher",
+                    "foreignField": "teacher",
+                    "as": "courses"
+                    }
+                }
+        ]
+    # aggregate is how mongoengine access pymongo 
+    # http://docs.mongoengine.org/guide/querying.html#aggregation
+    courses = Courses.objects().aggregate(pipeline)
+    return(courses)
+
+@app.route('/course/list')
+@app.route('/activecourses')
+@login_required
+def activecourses():
+
+    courses = getActiveCourses()
+
+    return render_template('courses.html',courses=courses,title="Active Courses")
+
+@app.route('/allcourses')
 @login_required
 def courseList():
 
@@ -95,8 +125,6 @@ def courseEdit(courseID):
     if form.validate_on_submit():
 
         editCourse.update(
-            course_number = form.course_number.data,
-            course_title = form.course_title.data,
             course_name = form.course_name.data,
             course_ag_requirement = form.course_ag_requirement.data,
             course_difficulty = form.course_difficulty.data,
@@ -116,6 +144,7 @@ def courseEdit(courseID):
     form.course_ag_requirement.data = editCourse.course_ag_requirement
     form.course_difficulty.data = editCourse.course_difficulty
     form.course_department.data = editCourse.course_department
+    form.course_pathway.data = editCourse.course_pathway
     form.course_pathway.data = editCourse.course_pathway
 
     return render_template('coursesform.html',form=form, course=editCourse)
@@ -145,6 +174,12 @@ def teachercourse(tcid):
 @app.route('/teachercourse/delete/<tcid>')
 @login_required
 def teachercourseDelete(tcid):
+    if current_user.isadmin:
+        delTCID = TeacherCourse.objects.get(id=tcid)
+        teacherID = delTCID.teacher.id
+        delTCID.delete()
+    else:
+        flash('Only Admins can delete.  If you teach this class you should be able to edit.')
     if current_user.isadmin:
         delTCID = TeacherCourse.objects.get(id=tcid)
         teacherID = delTCID.teacher.id
@@ -195,9 +230,15 @@ def teacherCourseAdd(teacherID,courseID=None):
 
     
     if courseID == None:
+
+    
+    if courseID == None:
         courses = Courses.objects()
         teacher = User.objects.get(id=teacherID)
         return render_template('teachercourseadd.html', teacher = teacher, courses=courses)
+    
+    flash(teacherID,current_user.id)
+    if teacherID != current_user.id and not current_user.isadmin:
     
     flash(teacherID,current_user.id)
     if teacherID != current_user.id and not current_user.isadmin:
